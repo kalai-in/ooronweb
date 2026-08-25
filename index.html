@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ooron Web App</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #0f172a;
+      --panel: rgba(15, 23, 42, 0.8);
+      --panel-border: rgba(148, 163, 184, 0.2);
+      --text: #e2e8f0;
+      --muted: #cbd5e1;
+      --accent: #38bdf8;
+      --accent-strong: #0ea5e9;
+      --card: rgba(30, 41, 59, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.25), transparent 40%),
+        linear-gradient(160deg, #020617 0%, #0f172a 50%, #1e293b 100%);
+      color: var(--text);
+    }
+
+    main {
+      width: min(1100px, calc(100% - 3rem));
+      margin: 0 auto;
+      padding: 4rem 0;
+    }
+
+    .hero {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      padding: 4rem 3rem;
+      box-shadow: 0 25px 50px rgba(2, 6, 23, 0.35);
+      backdrop-filter: blur(12px);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin: 0 0 1rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(14, 165, 233, 0.15);
+      color: #bae6fd;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      line-height: 1.05;
+    }
+
+    .hero p {
+      max-width: 42rem;
+      margin: 1.5rem 0 0;
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 3rem;
+      padding: 0 1.25rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      color: #f8fafc;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-1px);
+    }
+
+    .button.primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+    }
+
+    .button.secondary {
+      border-color: rgba(226, 232, 240, 0.25);
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .feature {
+      padding: 1.5rem;
+      background: var(--card);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 18px;
+    }
+
+    .feature h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.15rem;
+    }
+
+    .feature p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      main {
+        width: min(100% - 1.5rem, 1100px);
+        padding: 1.5rem 0;
+      }
+
+      .hero {
+        padding: 2.5rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Main Application Website</p>
+      <h1>Build and launch with confidence.</h1>
+      <p>
+        Ooron Web App provides a polished starting point for presenting your application,
+        highlighting core capabilities, and guiding visitors to the next step.
+      </p>
+      <div class="actions">
+        <a class="button primary" href="mailto:hello@ooron.app">Request a demo</a>
+        <a class="button secondary" href="#features">Explore features</a>
+      </div>
+      <div class="features" id="features">
+        <article class="feature">
+          <h2>Clear value proposition</h2>
+          <p>Lead with a simple message so visitors immediately understand what your application offers.</p>
+        </article>
+        <article class="feature">
+          <h2>Responsive layout</h2>
+          <p>Deliver a consistent experience across phones, tablets, laptops, and widescreen desktops.</p>
+        </article>
+        <article class="feature">
+          <h2>Fast to extend</h2>
+          <p>Start with a concise structure that can grow into a fuller marketing or product website later.</p>
+        </article>
+      </div>
+      <footer>Designed as the main application website entry point for the repository.</footer>
+    </section>
+  </main>
+</body>
+</html>
