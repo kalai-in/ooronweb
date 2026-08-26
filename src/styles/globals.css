@@ -1,0 +1,1636 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --layout-header-bg: var(--bs-body-bg);
+  --layout-header-bg-image: none;
+  /* Gradient spans the WHOLE header element (not per-row) so the two stacked
+     rows render one continuous fill instead of each restarting the gradient
+     and showing a seam. Falls back to the flat bg until JS derives one. */
+  --layout-header-gradient: var(--layout-header-bg);
+  --layout-header-text: var(--font-color);
+  /* Seeded here, NOT left to `var(--x, 0px)` fallbacks at the use site.
+     CategoryTabs publishes the real values, but it returns null when the
+     layout has no category tabs, so the vars can stay unset. An unset var
+     inside calc() substitutes EMPTY (the fallback only applies to the
+     var() itself), which turns `calc(var(--layout-header-h) + var(--layout-strip-h))`
+     into an invalid length — background-size resolved to `100% 0px` and the
+     header painted no image at all, leaving a bare band above the page. */
+  --layout-header-h: 0px;
+  --layout-strip-h: 0px;
+  --body-background-color: #fff;
+  --container-bg: #ffffff;
+  --primary-color: #470097;
+  --border-color: #d8e0e6;
+  --font-color: #141a1f;
+  --light-primary-color: #C8E5D5;
+  --footer-background-color: #141a1f;
+  --icons-background-color: #c8e5d530;
+  --button-background-color: #f3f5f7;
+  --font-family: "Instrument Sans", sans-serif;
+  --swiper-background-color: #f2f5f7;
+  --button-border-color: #8ba2b3;
+  /* --cart-button-bg: #55ae7b26; */
+  --bs-body-bg: #fff;
+  --shimmer-highlight-color: #dddddd;
+  --brand-bg-color: #F2F5F7;
+  --category-card-bg: #fff;
+  --nav-button-bg: #8BA2B3;
+  --sub-text-color: #595F65;
+  --secondary-text-color: rgba(20, 26, 31, 0.66);
+  --short-description-text-color: #5C788C;
+  --order-status-payment-pending-color: #e3aa0e;
+  --order-status-recieved: #319795;
+  --order-status-in-process-color: #e3aa0e;
+  --order-status-processed: #805AD5;
+  --order-status-shipped: #3182CE;
+  --order-status-out_for_delivery: #2D3748;
+  --order-status-delivered: #2D3748;
+  --order-status-cancelled: #db3232;
+  --order-status-returned: #458ae6;
+  --order-status-ready_to_pickup: #458ae6;
+  --order-status-picked: #59AC77;
+}
+
+.dark {
+  --nav-button-bg: #fff;
+  --category-card-bg: #000;
+  --body-background-color: #141414;
+  --button-background-color: #141414;
+  --primary-color: #470097;
+  --sub-text-color: #8b8b8b;
+  --second-cards-color: #202934;
+  --text-field-color: white;
+  --gray-hover-color: #dcdcdc;
+  --container-bg: #f2f3f9;
+  --font-color: white;
+  --button-border-color: #8ba2b3;
+  --bs-body-bg: #212529;
+  --swiper-background-color: #292F34;
+  --border-color: #4a4949;
+  --shimmer-highlight-color: #363e48;
+  --brand-bg-color: #40454A;
+  --secondary-text-color: rgba(255, 255, 255, 0.66);
+  --short-description-text-color: #fff;
+  --order-status-payment-pending-color: #e3aa0e;
+  --order-status-in-process-color: #e3aa0e;
+  --order-status-processed: #805AD5;
+  --order-status-shipped: #3182CE;
+  --order-status-out_for_delivery: #2D3748;
+  --order-status-delivered: #2D3748;
+  --order-status-cancelled: #db3232;
+  --order-status-returned: #458ae6;
+  --order-status-ready_to_pickup: #458ae6;
+  --order-status-picked: #59AC77;
+}
+
+@layer components {
+}
+
+/* :root {
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+} */
+
+* {
+  font-family: var(--font-family);
+}
+
+@layer utilities {
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .subTextColor {
+    color: var(--sub-text-color)
+  }
+
+  .SecondaryTextColor {
+    color: var(--secondary-text-color)
+  }
+
+  .shortDescriptionText {
+    color: var(--layout-header-text, var(--short-description-text-color));
+  }
+
+  .shortDescriptionTextBg {
+    background-color: color-mix(in srgb, var(--layout-header-text) 8%, transparent);
+  }
+
+  .textBackground {
+    background-color: var(--font-color);
+  }
+
+  .categoryCardBackground {
+    background-color: var(--category-card-bg);
+  }
+
+  .swiperNavButtonColor {
+    color: var(--nav-button-bg);
+  }
+
+  .swiperBorderColor {
+    border: 1px solid var(--nav-button-bg);
+  }
+
+
+  .headerBackgroundColor {
+    background-color: var(--bs-body-bg);
+  }
+
+  .layoutHeaderBg {
+    background-color: var(--layout-header-bg);
+    background-image: var(--layout-header-bg-image);
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Single gradient/image layer for the whole header wrapper. Inner rows stay
+     transparent so it reads as one continuous fill across them. */
+  .layoutHeaderGradient {
+    background-color: var(--layout-header-bg);
+    background-image: var(--layout-header-gradient);
+    background-size: var(--layout-header-bg-size, cover);
+    background-position: var(--layout-header-bg-pos, center);
+    background-repeat: no-repeat;
+    /* Something in the cascade resolves the header's `top-0` to `top: 22px`,
+       which pushed the sticky header down and left a 22px band of page
+       background above it. Pin it back to the viewport edge — this class is
+       only ever applied to the site header, so it can safely win. */
+    top: 0 !important;
+  }
+
+  /* Category tab strip sits directly below the header and continues the SAME
+     vertical fade — picking up from the header's bottom color and easing lighter,
+     so header + category read as one uninterrupted gradient (no seam). */
+  .layoutHeaderGradientContinue {
+    background-color: var(--layout-header-bg);
+    background-image: var(--layout-header-gradient-continue);
+    background-size: var(--layout-strip-bg-size, cover);
+    background-position: var(--layout-strip-bg-pos, center);
+    background-repeat: no-repeat;
+  }
+
+  .layoutHeaderText {
+    color: var(--layout-header-text);
+  }
+
+  .brandBackgroundColor {
+    background-color: var(--brand-bg-color);
+  }
+
+  .bodyBackgroundColor {
+    background-color: var(--body-background-color);
+  }
+
+  .primaryFilledColor {
+    fill: var(--primary-color);
+  }
+
+  .primaryBackColor {
+    background-color: var(--primary-color);
+  }
+
+  .primaryLightBack {
+    background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  }
+
+  .primaryAccentColor {
+    accent-color: var(--primary-color);
+  }
+
+  .primaryBorderColor {
+    border-color: var(--primary-color);
+  }
+
+  .cartButtonBackground {
+    background-color: var(--cart-button-bg);
+  }
+
+  .primaryBorder {
+    border: 1px solid var(--primary-color);
+  }
+
+  .primaryColorBorder {
+    border-color: var(--primary-color);
+  }
+
+  /* ---- Loader: skeleton shimmer ---- */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: #e9edf1;
+    border-radius: 8px;
+  }
+
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.65) 50%,
+      transparent 100%
+    );
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+  }
+
+  /* subtle primary tint variant */
+  .skeletonAccent {
+    background-color: color-mix(in srgb, var(--primary-color) 12%, #e9edf1);
+  }
+
+  @keyframes skeletonShimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* small inline spinner (cards, buttons) */
+  .loaderRing {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid color-mix(in srgb, var(--primary-color) 15%, transparent);
+    border-top-color: var(--primary-color);
+    animation: loaderSpin 0.8s linear infinite;
+  }
+
+  @keyframes loaderSpin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Back-to-top arrow: gentle idle bounce. */
+  .back-to-top-arrow {
+    animation: backToTopBounce 1.6s ease-in-out infinite;
+  }
+
+  @keyframes backToTopBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  /* Demo "Buy Now" FAB: idle ring pulse in the theme's primary color, so it
+     reads as a promo nudge without stealing the bounce already used for
+     back-to-top. Paused on hover — the expand transition reads oddly under a
+     simultaneous scale pulse. */
+  .demo-buy-now-pulse {
+    animation: demoBuyNowPulse 2.2s ease-out infinite;
+  }
+
+  .demo-buy-now-pulse:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes demoBuyNowPulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 55%, transparent); }
+    70% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary-color) 0%, transparent); }
+    100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 0%, transparent); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton::after { animation: none; }
+    .loaderRing { animation-duration: 2s; }
+    .back-to-top-arrow { animation: none; }
+    .demo-buy-now-pulse { animation: none; }
+  }
+
+
+  .primaryDashedBorder {
+    border: 2px dashed var(--primary-color);
+  }
+
+  .dashedBorder {
+    border: 1px dashed var(--nav-button-bg);
+  }
+
+  .primaryColor {
+    color: var(--primary-color);
+  }
+
+  .iconBackgroundColor {
+    background-color: var(--icons-background-color);
+  }
+
+  .iconsColor {
+    color: var(--primary-color);
+  }
+
+  .bodyTextColor {
+    color: var(--body-background-color);
+  }
+
+  .headerSearch {
+    border-radius: 5px;
+    box-shadow: 0 0 3px gray;
+    height: 50px;
+  }
+
+  .buttonBackground {
+    background-color: var(--button-background-color);
+  }
+
+  .footer {
+    background-color: var(--footer-background-color);
+  }
+
+  .cardBorder {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+  }
+
+  /* Brand-tinted card border. Used for the top-level cards on the checkout page
+     so they sit in the same visual family as the coupon panel, which is
+     primary-tinted. Deliberately NOT applied to .cardBorder itself — that class
+     backs ~49 files, and inner controls (radio rows, dashed buttons, inputs)
+     should stay neutral so the card edge stays the primary-tinted one. */
+  .cardBorderPrimary {
+    border: 1px solid color-mix(in srgb, var(--primary-color) 15%, transparent);
+    border-radius: 5px;
+  }
+
+  .fontColorBorder {
+    border: 1px solid var(--font-color);
+  }
+
+  .textColor {
+    color: var(--font-color);
+  }
+
+  .backgroundColor {
+    background-color: var(--swiper-background-color);
+  }
+
+  .disabledBackgroundColor {
+    background-color: var(--button-border-color);
+  }
+
+  .buttonBorder {
+    border: 1px solid var(--button-border-color);
+  }
+
+  .svgColors {
+    color: var(--button-border-color);
+  }
+
+  .bottomBorder {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .topBorder {
+    border-top: 1px solid var(--border-color);
+  }
+
+  .textPrimaryColor {
+    color: var(--primary-color);
+  }
+
+  .sellerHover {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+
+  .sellerTransation {
+    transition: color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+  }
+
+  .countryHover {
+    border: 1px solid var(--border-color);
+    color: var(--primary-color) !important;
+    outline: var(--secondary-color);
+    transform: none !important;
+  }
+
+  .fontColor {
+    color: var(--font-color);
+  }
+
+  .breadCrumbBg {
+    background-color: var(--swiper-background-color);
+  }
+
+  .breadCrumbBorder {
+    border-color: var(--border-color);
+  }
+
+  .breadCrumbTrailLink {
+    color: #6b7280;
+    transition: color 0.2s ease;
+  }
+
+  .breadCrumbTrailLink:hover {
+    color: var(--font-color);
+  }
+
+  .breadCrumbDot {
+    width: 4px;
+    height: 4px;
+    border-radius: 9999px;
+    background-color: #c4c9cf;
+    flex-shrink: 0;
+  }
+
+  .addToCartColor {
+    background-color: var(--light-primary-color)
+  }
+
+  .paymentPendingStatus {
+    color: var(--order-status-payment-pending-color);
+    border: 1px solid var(--order-status-payment-pending-color);
+  }
+
+  .orderInProcess {
+    color: var(--order-status-payment-pending-color);
+    border: 1px solid var(--order-status-payment-pending-color);
+  }
+
+  .orderRecieved {
+    color: var(--order-status-recieved);
+    border: 1px solid var(--order-status-recieved);
+  }
+
+  .orderProcessed {
+    color: var(--order-status-processed);
+    border: 1px solid var(--order-status-processed);
+  }
+
+  .orderShipped {
+    color: var(--order-status-shipped);
+    border: 1px solid var(--order-status-shipped);
+  }
+
+  .orderOutForDelivery {
+    color: var(--order-status-out_for_delivery);
+    border: 1px solid var(--order-status-out_for_delivery);
+  }
+
+  .orderDelivered {
+    color: var(--order-status-delivered);
+    border: 1px solid var(--order-status-delivered);
+  }
+
+  .orderCancelled {
+    color: var(--order-status-cancelled);
+    border: 1px solid var(--order-status-cancelled);
+  }
+
+  .orderReturned {
+    color: var(--order-status-returned);
+    border: 1px solid var(--order-status-returned);
+  }
+
+  .orderReadyToPickup {
+    color: var(--order-status-ready_to_pickup);
+    border: 1px solid var(--order-status-ready_to_pickup);
+  }
+
+  .orderPicked {
+    color: var(--order-status-picked);
+    border: 1px solid var(--order-status-picked);
+  }
+
+  .infoContent h1,
+  .infoContent h2,
+  .infoContent h3,
+  .infoContent h4,
+  .infoContent h5,
+  .infoContent h6 {
+    @apply font-bold;
+  }
+
+  .infoContent h1 {
+    @apply text-[40px] leading-[48px];
+  }
+
+  .infoContent h2 {
+    @apply text-[32px] leading-[38px];
+  }
+
+  .infoContent h3 {
+    @apply text-[28px] leading-[34px];
+  }
+
+  .infoContent h4 {
+    @apply text-[24px] leading-[29px];
+  }
+
+  .infoContent h5 {
+    @apply text-[20px] leading-[24px];
+  }
+
+  .infoContent h6 {
+    @apply text-[16px] leading-[19px];
+  }
+
+  /* Restore list bullets/numbers and link styling that Tailwind preflight
+     resets — CMS/API rich-text (About Us, Contact Us, policies) relies on
+     these. */
+  .infoContent ul {
+    @apply list-disc pl-5;
+  }
+
+  .infoContent ol {
+    @apply list-decimal pl-5;
+  }
+
+  .infoContent li {
+    @apply my-1;
+  }
+
+  .infoContent a {
+    @apply underline;
+    color: var(--primary-color);
+  }
+
+  /* Toast Margin Responsive */
+  div.toast-container-className {
+    @apply mx-3 my-2 md:mx-0 md:my-0;
+  }
+
+  .swiper-image {
+    border-radius: 12px;
+  }
+
+  .feature-section {
+    @apply py-6 md:py-12 px-2;
+  }
+
+  /* .promotion-image{
+    @apply 
+  } */
+}
+
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.homePageSwiper .swiper-pagination {
+  position: absolute;
+  bottom: 45px !important;
+  color: black;
+  width: fit-content !important;
+  padding: 0 10px !important;
+  margin: 0 auto;
+  left: 45% !important;
+  background-color: #fff !important;
+  border-radius: 4px !important;
+}
+
+.homePageSwiper .swiper-pagination-bullet-active {
+  background-color: var(--primary-color) !important;
+  width: 22px;
+  border-radius: 10px !important;
+}
+
+.category-node svg {
+  margin-left: 10px;
+}
+
+
+
+.react-tel-input .form-control {
+  position: relative;
+  font-size: 16px;
+  letter-spacing: 0.01rem;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-inline-start: 48px;
+  margin-left: 0;
+  background: #ffffff;
+  border: 1px solid #cacaca;
+  border-radius: 5px;
+  line-height: 25px;
+  height: 44px !important;
+  width: 100% !important;
+  outline: none;
+}
+
+.react-tel-input .selected-flag {
+  padding: 0px 5px 0 8px !important;
+}
+
+.react-tel-input .selected-flag .arrow {
+  right: 20px !important;
+}
+
+.react-loading-skeleton {
+  --base-color: var(--swiper-background-color) !important;
+}
+
+#recaptcha-container {
+  position: absolute !important;
+  z-index: 9999 !important;
+}
+
+.react-tel-input .flag-dropdown {
+  background-color: var(--body-background-color) !important;
+}
+
+.react-tel-input .form-control {
+  background-color: var(--body-background-color) !important;
+}
+
+.otp-container>input {
+  background-color: var(--body-background-color) !important;
+}
+
+.toastContainer {
+  background-color: var(--body-background-color) !important;
+}
+
+.react-tel-input .flag-dropdown.open .selected-flag {
+  background: var(--body-background-color) !important;
+}
+
+.react-tel-input .selected-flag:hover,
+.react-tel-input .selected-flag:focus {
+  background: var(--body-background-color) !important;
+}
+
+.react-tel-input .flag-dropdown.open .selected-flag {
+  background: var(--body-background-color) !important;
+}
+
+.react-tel-input .country-list {
+  background-color: var(--body-background-color) !important;
+}
+
+.react-tel-input .country-list .country:hover {
+  background: var(--swiper-background-color) !important;
+}
+
+.react-tel-input .country-list .country.highlight {
+  background-color: var(--bs-body-bg) !important;
+}
+
+.closeButtonBg {
+  background-color: var(--swiper-background-color);
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .swiper-pagination {
+    display: none;
+  }
+}
+
+@layer components {
+  .last-slide .rounded-md {
+    @apply rounded-tr-md rounded-br-md;
+  }
+}
+
+
+span.react-loading-skeleton {
+  --highlight-color: var(--shimmer-highlight-color) !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.custom-inner-image-zoom .iiz__img {
+  aspect-ratio: 3/1;
+  max-width: 100%;
+  width: 100%;
+  object-fit: cover;
+  height: 400px;
+  vertical-align: middle;
+  border-radius: 8px;
+}
+
+.custom-inner-image-zoom .iiz__hint {
+  display: none;
+}
+
+.pswp__zoom-wrap img {
+  object-fit: cover;
+  overflow: hidden;
+}
+
+
+/* Google-style autocomplete container */
+.pac-container {
+  border-radius: 8px;
+  border: 1px solid #dadce0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1000;
+
+}
+
+/* Individual autocomplete items */
+.pac-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.1s ease;
+  border: none;
+  color: var(--font-color) !important;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+
+/* Icon styling */
+.pac-icon {
+  width: 20px;
+  height: 20px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* Default location pin icon */
+.pac-icon::before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23757575"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>') no-repeat center;
+  background-size: contain;
+  display: block;
+}
+
+/* Text content */
+.pac-item-query {
+  font-weight: 500;
+  color: var(--font-color) !important;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Main text and secondary text on same line */
+.pac-item-query span {
+  display: inline;
+}
+
+.pac-matched {
+  font-weight: 600;
+  color: #1a73e8;
+}
+
+/* Secondary text (address details) - inline with main text */
+.pac-item-query .pac-matched+span {
+  color: #5f6368;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* Remove the separator */
+.pac-item-query::after {
+  display: none;
+}
+
+/* Scrollbar styling for webkit browsers */
+.pac-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.pac-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.pac-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.pac-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pac-container {
+    border-radius: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 0;
+  }
+
+  .pac-item {
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+
+  .pac-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 16px;
+  }
+}
+
+/* Loading state */
+.pac-container.pac-loading {
+  background: #fff;
+  text-align: center;
+  padding: 20px;
+  color: #5f6368;
+}
+
+.pac-container.pac-loading::before {
+  content: 'Loading...';
+  font-size: 14px;
+}
+
+/* Empty state */
+.pac-container:empty::before {
+  content: 'No results found';
+  display: block;
+  text-align: center;
+  padding: 20px;
+  color: #5f6368;
+  font-size: 14px;
+}
+
+/* Force white background in all cases */
+.pac-container {
+  background-color: var(--body-background-color) !important;
+}
+
+.pac-item {
+  background-color: transparent !important;
+}
+
+.pac-item:hover {
+  background-color: var(--swiper-background-color) !important;
+}
+
+.pac-item:focus,
+.pac-item.pac-item-selected {
+  background-color: var(--swiper-background-color) !important;
+}
+
+
+.pac-container.pac-loading {
+  background-color: var(--body-background-color) !important;
+}
+
+.custom-img-wrapper>div {
+  cursor: crosshair;
+  width: auto;
+  font-size: 0px;
+  position: relative;
+  user-select: none;
+  height: 100% !important;
+}
+
+.my-custom-image-class {
+  aspect-ratio: 3/1;
+  max-width: 100%;
+  width: 100%;
+  /* object-fit: cover; */
+  height: 100% !important;
+  vertical-align: middle;
+  border-radius: 8px;
+}
+
+.blog-description * {
+  text-align: start !important;
+}
+
+.blog-card-description {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+}
+
+.blog-card-description * {
+  display: inline !important;
+}
+
+
+/* Normalize CMS HTML: follow page direction, never overflow, override inline styles */
+.api-html-content {
+  word-break: normal;
+  overflow-wrap: normal;
+  white-space: normal;
+  text-align: start;
+  max-width: 100%;
+}
+
+/* CMS sometimes sets white-space:nowrap or fixed width inline — neutralize on
+   descendants only (NOT the wrapper, so its inline max-width column holds) */
+.api-html-content * {
+  white-space: normal !important;
+  max-width: 100% !important;
+  width: auto !important;
+}
+
+/* clamp only block media so they never overflow; never touch inline width
+   (clamping inline span width forces mid-word breaks like "t/he") */
+.api-html-content img,
+.api-html-content video,
+.api-html-content iframe,
+.api-html-content table,
+.api-html-content pre {
+  max-width: 100%;
+}
+
+.api-html-content img,
+.api-html-content video,
+.api-html-content iframe {
+  height: auto;
+}
+
+/* CMS injects inline text-align:left — force alignment to follow page dir.
+   direction left natural so English stays LTR, Urdu stays RTL. */
+[dir="rtl"] .api-html-content,
+[dir="rtl"] .api-html-content :where(p, h1, h2, h3, h4, h5, h6, li, span, div, blockquote) {
+  text-align: start !important;
+}
+
+.api-html-content h1 {
+  @apply text-3xl font-bold mb-4 mt-6 block border-b pb-2;
+}
+
+.api-html-content h2 {
+  @apply text-2xl font-bold mb-3 mt-5 block;
+}
+
+.api-html-content h3 {
+  @apply text-xl font-bold mb-2 mt-4 block;
+}
+
+.api-html-content p {
+  @apply mb-4 leading-relaxed block;
+}
+
+.api-html-content img {
+  @apply w-full h-auto max-h-[480px] object-cover rounded-xl my-6 block;
+}
+
+.api-html-content a {
+  @apply underline underline-offset-2;
+  color: var(--primary-color, #2563eb);
+}
+
+.api-html-content blockquote {
+  @apply border-s-4 ps-4 my-6 italic text-gray-600;
+}
+
+.api-html-content strong,
+.api-html-content b {
+  @apply font-bold;
+}
+
+.api-html-content ul {
+  @apply list-disc ms-6 mb-4;
+}
+
+.api-html-content ol {
+  @apply list-decimal ms-6 mb-4;
+}
+
+.api-html-content li {
+  @apply mb-1;
+}
+
+.api-html-content br {
+  @apply block content-[""] my-2;
+}
+
+.api-html-content table {
+  @apply w-full border-collapse border border-gray-300 my-4;
+  table-layout: auto;
+}
+
+.api-html-content th,
+.api-html-content td {
+  @apply border border-gray-300 p-2 text-start;
+  min-width: 50px;
+}
+
+.api-html-content th {
+  @apply bg-gray-100 font-bold;
+}
+
+
+.api-html-content span[style],
+.api-html-content p[style] {
+  font-family: inherit;
+}
+
+/* Premium Custom Scrollbar for overflow containers */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.6);
+}
+
+/* Product grid column switcher (2/3/4/5). Mobile (<md) keeps 2 cols via Tailwind.
+   From md up, honor the chosen count (--grid-cols, set inline by ProductsList)
+   at every breakpoint — no caps, so picking 5 gives 5 on tablet too. */
+@media (min-width: 768px) {
+  .product-grid-cols {
+    grid-template-columns: repeat(var(--grid-cols, 4), minmax(0, 1fr)) !important;
+  }
+}
+/* dropdown menu pop-in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96) translateY(-2px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/*
+ * Product-card gallery flip. Re-keying the active image remounts this element,
+ * replaying the half-flip: the new image swings in from edge-on (rotateY -90°,
+ * faded) to flat. Parent must set `perspective` so the rotation reads as 3D.
+ */
+@keyframes cardImageFlipIn {
+  from { opacity: 0; transform: rotateY(-90deg); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; transform: rotateY(0deg); }
+}
+.card-image-flip {
+  animation: cardImageFlipIn 0.9s ease-out both;
+  transform-origin: center;
+  backface-visibility: hidden;
+}
+
+/*
+ * Savings reward card — a diagonal glossy highlight sweeps across the gradient
+ * on a slow loop, giving the panel a premium "shine" without any JS.
+ */
+@keyframes savingsShineSweep {
+  0%   { transform: translateX(-150%) skewX(-20deg); }
+  100% { transform: translateX(250%) skewX(-20deg); }
+}
+.savings-shine {
+  animation: savingsShineSweep 3.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .savings-shine { animation: none; }
+}
+
+/*
+ * Element + attribute-qualified override for the .primaryBackColor utility.
+ * Kept outside @layer utilities: under Tailwind's JIT the variant expansion of
+ * `hover:primaryBackColor` collided with this complex selector and emitted CSS
+ * that Next 16's Turbopack parser rejects. Plain top-level CSS keeps the same
+ * specificity without going through variant generation.
+ */
+button.primaryBackColor[data-state="checked"] {
+  background-color: var(--primary-color) !important;
+}
+
+/* Myntra-style like animation — heart pop + ring flash + radiating particles.
+   Classes toggled on a fresh like: `.like-pop` (heart), `.like-ring`, `.like-particle`. */
+@keyframes likePop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Each particle shoots out along its own angle (--i) then fades. */
+@keyframes likeParticle {
+  0% {
+    transform: rotate(calc(var(--i) * 60deg)) translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(calc(var(--i) * 60deg)) translateY(-14px) scale(0.2);
+    opacity: 0;
+  }
+}
+
+.like-pop {
+  animation: likePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.like-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 9999px;
+  background: var(--primary-color);
+  transform-origin: center;
+  animation: likeParticle 0.5s ease-out forwards;
+}
+
+/* ===== Applied-coupon success micro-interaction =====
+   Premium, lightweight entry: icon scales 0→1 with a subtle bounce, then the
+   success text fades + slides up, and the saved amount fades in — 500–700ms
+   total, cubic-bezier for a modern e-commerce feel. Reduced-motion → plain fade. */
+.coupon-card{
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    overflow:hidden;
+}
+
+/* Icon */
+
+@keyframes couponSuccessIcon{
+
+0%{
+opacity:0;
+transform:scale(.2) rotate(-15deg);
+}
+
+35%{
+opacity:1;
+transform:scale(1.18) rotate(4deg);
+}
+
+55%{
+transform:scale(.94);
+}
+
+75%{
+transform:scale(1.05);
+}
+
+100%{
+transform:scale(1) rotate(0deg);
+}
+
+}
+
+.coupon-icon-success{
+
+animation:couponSuccessIcon .6s cubic-bezier(.22,1,.36,1) both;
+
+}
+
+
+/* Content */
+
+@keyframes couponSuccessContent{
+
+0%{
+
+opacity:0;
+transform:translateY(14px);
+
+}
+
+100%{
+
+opacity:1;
+transform:translateY(0);
+
+}
+
+}
+
+.coupon-content-success{
+
+opacity:0;
+
+animation:couponSuccessContent .45s cubic-bezier(.22,1,.36,1) forwards;
+
+animation-delay:.22s;
+
+}
+
+
+/* Amount */
+
+@keyframes couponSuccessAmount{
+
+0%{
+
+opacity:0;
+
+transform:translateY(8px) scale(.7);
+
+}
+
+60%{
+
+opacity:1;
+
+transform:translateY(0) scale(1.12);
+
+}
+
+100%{
+
+transform:scale(1);
+
+opacity:1;
+
+}
+
+}
+
+.coupon-save-success{
+
+opacity:0;
+
+animation:couponSuccessAmount .42s cubic-bezier(.22,1,.36,1) forwards;
+
+animation-delay:.38s;
+
+}
+
+
+/* Shine */
+
+.coupon-card::before{
+
+content:"";
+
+position:absolute;
+
+top:0;
+
+left:-140%;
+
+width:60%;
+
+height:100%;
+
+background:linear-gradient(
+
+90deg,
+
+transparent,
+
+rgba(255,255,255,.35),
+
+transparent
+
+);
+
+transform:skewX(-20deg);
+
+animation:couponShine .8s ease .15s;
+
+}
+
+@keyframes couponShine{
+
+100%{
+
+left:170%;
+
+}
+
+}
+
+
+/* Reduced motion */
+
+@media(prefers-reduced-motion:reduce){
+
+.coupon-icon-success,
+
+.coupon-content-success,
+
+.coupon-save-success,
+
+.coupon-card::before{
+
+animation:none;
+
+opacity:1;
+
+transform:none;
+
+}
+
+}
+
+/* ===== react-international-phone — RTL corner/border fix =====
+   The library styles the country button rounded on the LEFT and the input
+   rounded on the RIGHT (LTR). When we mirror the widget (dir="rtl"), the
+   flag sits on the right, so swap which corners are rounded and which
+   adjoining border is removed, otherwise the two pieces show a broken /
+   doubled border between them. */
+[dir="rtl"] .react-international-phone-country-selector-button {
+  border-radius: 0
+    var(--react-international-phone-border-radius, 4px)
+    var(--react-international-phone-border-radius, 4px) 0 !important;
+  border-left: none !important;
+  border-right: 1px solid
+    var(--react-international-phone-border-color, var(--border-color)) !important;
+}
+[dir="rtl"] .react-international-phone-input {
+  border-radius: var(--react-international-phone-border-radius, 4px) 0 0
+    var(--react-international-phone-border-radius, 4px) !important;
+  border-left: 1px solid
+    var(--react-international-phone-border-color, var(--border-color)) !important;
+  border-right: none !important;
+}
+
+/* ── Category grid animations ─────────────────────────────────────────────
+   Cards fade + rise into place on mount; the per-card delay is set inline via
+   --card-index so tiles cascade in a stagger. The subcategory dropdown pops
+   down from the toggle. Reduced-motion collapses both to a plain instant show. */
+@keyframes categoryCardIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes categoryDropdownIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.categoryCardIn {
+  opacity: 0;
+  position: relative;
+  z-index: 0;
+  animation: categoryCardIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--card-index, 0) * 45ms);
+}
+
+/* When a card inside this wrapper opens its dropdown, lift the whole wrapper
+   above sibling rows so the floating subcategory panel is not covered. */
+.categoryCardIn:has([data-expanded="true"]) {
+  z-index: 30;
+}
+
+.categoryDropdownIn {
+  transform-origin: top center;
+  animation: categoryDropdownIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .categoryCardIn,
+  .categoryDropdownIn {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Toast — premium react-toastify skin
+   Crisp surface, solid-fill gradient icon, hairline progress, layered shadow.
+   No coloured rail, no tinted halo — the accent lives only in the icon.
+   ═══════════════════════════════════════════════════════════════════════ */
+/* Mobile: full-width strip pinned to the top with equal side gutters.
+   Overrides react-toastify's default fixed 320px width + edge inset so the
+   card never overflows or clips off-screen on small viewports. */
+.appToastContainer {
+  width: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+@media (min-width: 480px) {
+  .appToastContainer {
+    width: 400px;
+    left: auto;
+    right: 0;
+    padding: 12px;
+  }
+  .appToastContainer.Toastify__toast-container--rtl {
+    left: 0;
+    right: auto;
+  }
+}
+.appToastContainer .appToast {
+  width: 100%;
+}
+
+.appToast {
+  --toast-accent: #64748b;
+  --toast-surface: #ffffff;
+  --toast-text: #111827;
+  --toast-sub: #6b7280;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  color: var(--toast-text);
+  background: var(--toast-surface);
+  border: 1px solid rgba(17, 24, 39, 0.07);
+  box-shadow:
+    0 1px 2px rgba(17, 24, 39, 0.04),
+    0 8px 24px -8px rgba(17, 24, 39, 0.16);
+}
+
+/* per-type accent colours */
+.appToast.Toastify__toast--success {
+  --toast-accent: #16a34a;
+}
+.appToast.Toastify__toast--error {
+  --toast-accent: #ef4444;
+}
+.appToast.Toastify__toast--warning {
+  --toast-accent: #f59e0b;
+}
+.appToast.Toastify__toast--info {
+  --toast-accent: #6366f1;
+}
+
+/* body holds [icon][message] and grows to push the close button right */
+.appToastBody {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.006em;
+  line-height: 1.4;
+  color: var(--toast-text);
+}
+/* the message text node react-toastify wraps in the body's last child */
+.appToastBody > div:last-child {
+  flex: 1 1 auto;
+  word-break: break-word;
+}
+
+/* accent-filled coin — crisp white glyph, soft matching glow */
+.appToastIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  color: #ffffff;
+  background: var(--toast-accent);
+  box-shadow: 0 2px 8px -2px color-mix(in srgb, var(--toast-accent) 55%, transparent);
+}
+.appToastIcon svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 3;
+}
+
+/* Progress bar is hidden via the hideProgressBar prop — do NOT set
+   display:none here. react-toastify drives autoClose off this bar's CSS
+   animation (animationend), so hiding it with display:none stops the
+   animation and the toast never auto-dismisses. Keep it in the layout,
+   just invisible. */
+.appToastProgress {
+  opacity: 0;
+  height: 0;
+}
+
+/* close button — quiet until hover, spaced off the message */
+.appToast .Toastify__close-button {
+  align-self: center;
+  flex-shrink: 0;
+  margin-left: 14px;
+  color: var(--toast-sub);
+  opacity: 0.55;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.appToast .Toastify__close-button > svg {
+  width: 18px;
+  height: 18px;
+}
+.appToast .Toastify__close-button:hover {
+  opacity: 1;
+  color: var(--toast-text);
+}
+
+/* Dark theme surface */
+:root[data-theme="dark"] .appToast,
+.dark .appToast {
+  --toast-surface: #1c1d22;
+  --toast-text: #f3f4f6;
+  --toast-sub: #9ca3af;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 8px 24px -8px rgba(0, 0, 0, 0.6);
+}
+.leaflet-control-attribution {
+    display: none !important;
+}

@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    RewriteRule ^/.well-known/acme-challenge/(.*) /.well-known/acme-challenge/$1 [L]
+
+    # Everything (including /_next/*) is proxied to Node.
+    # Do NOT map ^_next/ to the filesystem: /_next/static/* are real files, but
+    # /_next/data/* and /_next/image are SSR ROUTES with no file behind them —
+    # mapping them to disk returns a 404 HTML page instead of JSON.
+    # Next serves /_next/static/* with immutable cache headers, so browsers
+    # fetch each chunk once anyway.
+    RewriteRule ^index.html http://127.0.0.1:8004/$1 [P]
+    RewriteRule ^index.php http://127.0.0.1:8004/$1 [P]
+    RewriteRule ^/?(.*)$ http://127.0.0.1:8004/$1 [P]
+</IfModule>
