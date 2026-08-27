@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+build
+coverage
+.git
+.gitignore
+.vscode
+docs
+scratch
+*.md
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
