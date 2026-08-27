@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1
 
 # ---- deps: install all dependencies (needed for build tools like tailwind/postcss) ----
-FROM node:20-alpine AS deps
+# Node 22+ required: jsdom (via isomorphic-dompurify) needs util.markAsUncloneable, missing on Node 20.
+FROM node:24-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
@@ -10,21 +11,21 @@ RUN npm ci
 # ---- builder: build the Next.js app ----
 # .env must be present in the build context — NEXT_PUBLIC_* vars are inlined
 # at build time (see docs/DEPLOYMENT_VPS.md).
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
 # ---- prod-deps: production-only node_modules for the runtime image ----
-FROM node:20-alpine AS prod-deps
+FROM node:24-alpine AS prod-deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --omit=dev
 
 # ---- runner: minimal runtime image ----
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NODE_PORT=8004
