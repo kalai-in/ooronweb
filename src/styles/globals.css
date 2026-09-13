@@ -21,7 +21,7 @@
   --layout-strip-h: 0px;
   --body-background-color: #fff;
   --container-bg: #ffffff;
-  --primary-color: #470097;
+  --primary-color: #0E9623;
   --border-color: #d8e0e6;
   --font-color: #141a1f;
   --light-primary-color: #C8E5D5;
@@ -58,7 +58,7 @@
   --category-card-bg: #000;
   --body-background-color: #141414;
   --button-background-color: #141414;
-  --primary-color: #470097;
+  --primary-color: #0E9623;
   --sub-text-color: #8b8b8b;
   --second-cards-color: #202934;
   --text-field-color: white;
@@ -633,9 +633,14 @@ input[type="number"]::-webkit-outer-spin-button {
   --base-color: var(--swiper-background-color) !important;
 }
 
-#recaptcha-container {
-  position: absolute !important;
-  z-index: 9999 !important;
+/* Keep in normal flow (not absolute) so it renders in its own row below the
+   modal's submit button instead of floating on top of it. Firebase's own
+   challenge iframe still positions itself independently when it appears. */
+#recaptcha-container,
+#register-recaptcha-container,
+#forgot-recaptcha-container {
+  position: relative !important;
+  z-index: 10 !important;
 }
 
 .react-tel-input .flag-dropdown {
@@ -1150,6 +1155,26 @@ input[type=number] {
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.96) translateY(-2px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/*
+ * Search bar's rotating placeholder hint (SearchComponent.tsx). Re-keying the
+ * suggestion span on index change remounts it, replaying this slide-up +
+ * fade-in — a CSS-only stand-in for what used to be a framer-motion
+ * AnimatePresence cross-fade, dropped so the ~130KB library doesn't ship for
+ * one decorative hint animation.
+ */
+@keyframes searchHintSlideIn {
+  from { opacity: 0; transform: translateY(110%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.search-hint-slide {
+  animation: searchHintSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .search-hint-slide {
+    animation: none;
+  }
 }
 
 /*
