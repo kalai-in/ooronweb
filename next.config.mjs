@@ -54,52 +54,16 @@ const nextConfig = {
     formats: ["image/avif", "image/webp"],
     remotePatterns,
     qualities: [70, 75, 95],
-    // Capped at 1920 — the layout's widest element (a full-bleed banner) never
-    // renders past the viewport, so the default's 2048/3840 entries only ever
-    // serve a 2x-DPR request for a box that's already capped, inflating the
-    // "improve image delivery" audit for no visual gain.
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    // Product/banner images rarely change once uploaded — 1 day (default 60s)
-    // cuts repeat /_next/image work on return visits.
-    minimumCacheTTL: 86400,
+    unoptimized: true,
   },
 
   experimental: {
     scrollRestoration: true,
-    // Named imports from these packages otherwise pull in the whole barrel
-    // file per import site — this rewrites them to deep imports at build
-    // time so only the icons/components actually used ship to the client.
-    optimizePackageImports: ["react-icons", "lucide-react", "framer-motion"],
   },
 };
-
-// Long-lived caching for versioned-by-content-rarely-changing static assets.
-// Skipped for a static export ("output: export" below) — that target is
-// served by a plain file host (Apache/Nginx/S3), which ignores Next's
-// headers() entirely, so the same rules belong in that host's own config
-// instead (see copy-htaccess.js).
-if (process.env.NEXT_PUBLIC_SEO !== "false") {
-  nextConfig.headers = async () => [
-    {
-      source: "/icons/:path*",
-      headers: [
-        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-      ],
-    },
-    {
-      source: "/favicon.webp",
-      headers: [
-        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-      ],
-    },
-  ];
-}
 
 if (process.env.NEXT_PUBLIC_SEO === "false") {
   // Replaces "standalone" — a static export ships HTML only, no node server.
   nextConfig.output = "export";
-  // A static export ships HTML only, with no server to run the image
-  // optimizer — sharp needs the Node process this build won't have.
-  nextConfig.images.unoptimized = true;
 }
 export default nextConfig;
