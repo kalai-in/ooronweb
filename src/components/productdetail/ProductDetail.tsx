@@ -1620,7 +1620,7 @@ const ProductDetail = ({ initialProduct = null }: ProductDetailProps) => {
       <ShareDrawer
         open={isShareOpen}
         onClose={() => setIsShareOpen(false)}
-        url={`${process.env.NEXT_PUBLIC_BASE_URL}${decodeURI(pathname)}`}
+        url={`${process.env.NEXT_PUBLIC_BASE_URL}${decodeURI(pathname || "/")}`}
         title={displayName}
         description={product?.short_description}
         image={selectedImage || product?.image_url}
